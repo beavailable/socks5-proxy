@@ -28,7 +28,7 @@ class SocksServer:
             try:
                 await self.handle_connection_core(client)
             except Exception as e:
-                self._log.info('unexpected exception with %s', type(e).__name__)
+                self._log.warning('unexpected exception with %s', type(e).__name__)
 
     async def handle_connection_core(self, client):
         # request
