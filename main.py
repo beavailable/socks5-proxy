@@ -92,6 +92,8 @@ class SocksServer:
         while True:
             data = await src.read(BUF_SIZE)
             if not data:
+                # close dst as early as possible
+                await dst.close()
                 break
             await dst.write(data)
 
