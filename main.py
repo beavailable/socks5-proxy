@@ -40,7 +40,7 @@ class SocksServer:
         VERSION = 0x05
         ver, nmethods = await client.readexactly(2)
         if ver != VERSION or nmethods < 1:
-            return
+            raise BadRequestError
         await client.readexactly(nmethods)
         # response
         # +-------+----------+
@@ -61,7 +61,7 @@ class SocksServer:
         ATYP_IPV6 = 0x04
         ver, cmd, _, atyp = await client.readexactly(4)
         if ver != VERSION or cmd != CMD_CONNECT:
-            return
+            raise BadRequestError
         if atyp == ATYP_IPV4:
             host = await client.readipv4()
         elif atyp == ATYP_DOMAIN:
@@ -69,7 +69,7 @@ class SocksServer:
         elif atyp == ATYP_IPV6:
             host = await client.readipv6()
         else:
-            return
+            raise BadRequestError
         port = await client.readshort()
         try:
             reader, writer = await asyncio.wait_for(asyncio.open_connection(host, port, proto=socket.IPPROTO_TCP, flags=socket.AI_PASSIVE), 10)
@@ -148,6 +148,10 @@ class SocketWrapper:
 
     async def __aexit__(self, *ex):
         await self.close()
+
+
+class BadRequestError(Exception):
+    pass
 
 
 class Config:
